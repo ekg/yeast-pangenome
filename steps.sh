@@ -16,7 +16,7 @@ cat ordered_genomes | while read file; do zcat $file; done | pigz >Sc+Sp.pan.fa.
 time ./pan-minimap2 $(ls *genome.prefix* | grep -v Sarb | grep -v mt. ) | pigz >Sc+Sp.pan.paf.gz
 
 # use fpa to filter short alignments
-zcat Sc+Sp.pan.paf.gz | fpa -l 10000 | pigz >Sc+Sp.pan.fpal10k.paf.gz
+zcat Sc+Sp.pan.paf.gz | fpa keep -L 10000 | pigz >Sc+Sp.pan.fpal10k.paf.gz
 
 # construct the graph from the alignments using seqwish
 mkdir -p work # a work directory that's local, files created here will be deleted when seqwish completes
@@ -33,7 +33,7 @@ odgi stats -i Sc+Sp.pan.fpal10k.dg -S
 # the graph has about 20M of sequence
 
 # build the graph with a weaker filter on the alignment length
-zcat Sc+Sp.pan.paf.gz | fpa -l 2000 | pigz >Sc+Sp.pan.fpal2k.paf.gz
+zcat Sc+Sp.pan.paf.gz | fpa keep -L 2000 | pigz >Sc+Sp.pan.fpal2k.paf.gz
 time seqwish -s Sc+Sp.pan.fa.gz -p Sc+Sp.pan.fpal2k.paf.gz -t 20 -b work/x -g Sc+Sp.pan.fpal2k.gfa
 
 # transform the graph into odgi format and compact/order its id space
